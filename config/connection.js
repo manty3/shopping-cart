@@ -9,9 +9,9 @@ const URL = process.env.MONGODB_URL_LOCAL;
 
 const connect = async () => {
   try {
-    console.log("MongoDB URL:", URL);
-    const connection = await mongoose.connect(URL);
-    state.db = connection.connection.db; // <-- Add this line to correctly set the db object
+    console.log("MongoDB URL:", URL); // Check if URL is printed correctly
+    const connection = await mongoose.connect(URL, { useNewUrlParser: true, useUnifiedTopology: true });
+    state.db = connection.connection.db;
 
     console.log("Database connection established using mongoose");
   } catch (err) {
@@ -22,7 +22,13 @@ const connect = async () => {
   }
 };
 
-const get = () => state.db;
+const get = () => {
+  if (!state.db) {
+    console.error("Error: Database not connected");
+    throw new Error("Database not connected");
+  }
+  return state.db;
+};
 
 module.exports = {
   connect,
